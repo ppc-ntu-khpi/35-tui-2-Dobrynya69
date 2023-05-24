@@ -1,10 +1,15 @@
 package com.mybank.tui;
 
+import com.mybank.data.DataSource;
+import com.mybank.reporting.CustomerReport;
 import com.mybank.domain.Bank;
 import com.mybank.domain.CheckingAccount;
 import com.mybank.domain.Customer;
-import com.mybank.domain.SavingsAccount;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,6 +64,9 @@ public class CLIdemo {
         while ((line = readLine(reader, "")) != null) {
             if ("help".equals(line)) {
                 printHelp();
+            } else if ("report".equals(line)) {
+                CustomerReport report = new CustomerReport();
+                report.generateReport();
             } else if ("customers".equals(line)) {
                 AttributedStringBuilder a = new AttributedStringBuilder()
                         .append("\nThis is all of your ")
@@ -122,7 +130,8 @@ public class CLIdemo {
 
     private void printHelp() {
         System.out.println("help\t\t\t- Show help");
-        System.out.println("customer\t\t- Show list of customers");
+        System.out.println("customers\t\t- Show list of customers");
+        System.out.println("report\t\t- Show list customers report");
         System.out.println("customer \'index\'\t- Show customer details");
         System.out.println("exit\t\t\t- Exit the app");
 
@@ -141,12 +150,16 @@ public class CLIdemo {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        Bank.addCustomer("John", "Doe");
-        Bank.addCustomer("Fox", "Mulder");
-        Bank.getCustomer(0).addAccount(new CheckingAccount(2000));
-        Bank.getCustomer(1).addAccount(new SavingsAccount(1000, 3));
+        File currentClassFile = new File(URLDecoder.decode(CLIdemo.class
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath(), "UTF-8"));
+        String classFileDirectory = currentClassFile.getParent();
+        DataSource data = new DataSource(classFileDirectory+"\\35-tui-2-Dobrynya69\\test.dat");
+        data.loadData();
 
         CLIdemo shell = new CLIdemo();
         shell.init();
